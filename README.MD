@@ -19,7 +19,8 @@ podman play kube devEnvironment.yaml
 podman run -it -p 8080:3000 \
     -v mnt/c/Users/.../nest-react-mongo:/usr/src/app \
     --name debian-dev-nestjs \
-    fedoradevnestjsimg
+    fedoradevnestjsimg 
+```
 
 ### Utils scripts
 
