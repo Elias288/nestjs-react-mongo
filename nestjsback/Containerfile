@@ -1,9 +1,11 @@
-FROM node:18
+FROM fedora:38
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
-COPY package*.json ./
-COPY tsconfig*.json ./
-RUN npm install
-COPY . .
-CMD npm run build && \
-node dist/main
+
+RUN dnf upgrade -y
+RUN dnf install -y \
+    procps && \
+    dnf module install -y \
+    nodejs
+RUN npm install -g npm@9.6.7 \
+    @nestjs/cli

@@ -28,13 +28,13 @@
 
 ## Installation
 
-```bash
+```sh
 $ npm install
 ```
 
 ## Running the app
 
-```bash
+```sh
 # development
 $ npm run start
 
@@ -47,7 +47,7 @@ $ npm run start:prod
 
 ## Test
 
-```bash
+```sh
 # unit tests
 $ npm run test
 
