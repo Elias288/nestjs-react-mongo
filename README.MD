@@ -8,33 +8,54 @@ Commands to compile the container image and the container where the backend will
 
 Located in [nestjsback](./nestjsback/):
 
+---
+### GENERATE THE DEV ENVIRONMENT POD WITH KUBERNETES
+
+To begin this project, the following steps must be followed:
+- Duplicate the file [devEnvironment.yaml.example](./nestjsback/devEnvironment.yaml.example) and delete the '.example' extension 
+- Change the database password in the environment variable `MONGO_INITDB_ROOT_PASSWORD` 
+- Change the path of the backend volume where the project is located. (In the example: `/mnt/c/Users/.../nest-react-mongo/nestjsback`)
+
+Once we have that, we continue with:
+
 ```sh
-# GENERATE THE DEV ENVIRONMENT WHIT Containerfile
+# GENERATE THE DEV ENVIRONMENT IMAGE WITH Containerfile
 podman build -t fedoradevnestjsimg .
 
-# Generate the dev enviroment container
+# GENERATE THE DEV ENVIRONMENT POD
 podman play kube devEnvironment.yaml
-
-# MANUALLY
-podman run -it -p 8080:3000 \
-    -v mnt/c/Users/.../nest-react-mongo:/usr/src/app \
-    --name debian-dev-nestjs \
-    fedoradevnestjsimg 
 ```
 
-### Utils scripts
+---
 
->  Automatically initialize the container with [init.sh](./nestjsback/scripts/init.sh)
-> ```sh
-> bash scripts/init.sh
-> ```
+### GENERATE THE DEV ENVIRONMENT POD MANUALLY
 
->  Restart the container with [restart.sh](./nestjsback/scripts/restart.sh)
-> ```sh
-> bash scripts/restart.sh
-> ```
+Another method to implement this project is to do it manually:
 
->  Delete container and image with [clear.sh](./nestjsback/scripts/clear.sh)
-> ```sh
-> bash scripts/restart.sh
-> ```
+```sh
+# GENERATE THE DEV ENVIRONMENT IMAGE WITH Containerfile
+podman build -t fedoradevnestjsimg .
+# POD
+podman pod create \
+    --name nest-react-mongo-pod
+    -p 8080:3000 \
+    -p 27017:27017
+
+# BACKEND
+podman run -d \
+    --pod nest-react-mongo-pod
+    -v mnt/c/Users/.../nest-react-mongo:/usr/src/app \
+    --name nest-react-mongo-pod-nestbackend \
+    fedoradevnestjsimg
+
+# DATABASE
+# IF THE VOLUME DOES NOT EXIST, WE CREATE IT
+podman volume create mongoDbVolume
+
+podman run -d \
+    --pod nest-react-mongo-pod \
+    -v mongoDbVolume:/data/db \
+    -e MONGO_INITDB_ROOT_USERNAME=root \
+    -e MONGO_INITDB_ROOT_PASSWORD=<yourPassword> \
+    mongo
+```

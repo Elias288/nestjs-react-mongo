@@ -3,14 +3,14 @@ kind: Pod
 metadata:
   creationTimestamp: "2023-05-31T13:44:16Z"
   labels:
-    app: debianDev-pod
-  name: debianDev-pod
+    app: nest-react-mongo-pod
+  name: nest-react-mongo-pod
 spec:
   containers:
-  - command:
+  - name: nestbackend
+    command:
     - /bin/bash
-    image: localhost/debiandevnestjsimg:latest
-    name: container
+    image: localhost/fedoradevnestjsimg:latest
     stdin: true
     tty: true
     ports:
@@ -18,9 +18,23 @@ spec:
         hostPort: 8080
     volumeMounts:
     - mountPath: /usr/src/app
-      name: debianVolume
+      name: fedoraVolume
+  - name: mongoDB
+    image: mongo
+    ports: 
+      - containerPort: 27017
+        hostPort: 27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME: root
+      - MONGO_INITDB_ROOT_PASSWORD: <yourPassword>
+    volumeMounts:
+    - mountPath: /data/db
+      name: mongoDbVolume
   volumes:
-  - hostPath:
+  - name: fedoraVolume
+    hostPath:
       path: /mnt/c/Users/.../nest-react-mongo/nestjsback
       type: Directory
-    name: debianVolume
+  - name: mongoDbVolume
+    persistentVolumeClaim:
+        claimName: nest-react-mongodb_-_db-volume
